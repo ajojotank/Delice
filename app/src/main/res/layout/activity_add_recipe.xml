@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Main Content Area -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp">
+
+            <ImageView
+                android:id="@+id/imageRecipeMain"
+                android:layout_width="match_parent"
+                android:layout_height="270dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/placeholder"
+                android:scaleX="0.7"
+                android:scaleY="0.7"
+                android:clickable="true"
+                android:focusable="true"
+                android:contentDescription="Image Upload"
+                tools:ignore="ContentDescription" />
+
+            <EditText
+                android:id="@+id/editTextRecipeTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/imageRecipeMain"
+                android:layout_marginTop="16dp"
+                android:hint="Enter Recipe Title"
+                android:inputType="textCapWords"
+                android:textColorHint="#000"
+                android:textColor="#000"
+                android:backgroundTint="#000"/>
+
+            <EditText
+                android:id="@+id/editTextRecipeDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/editTextRecipeTitle"
+                android:layout_marginTop="16dp"
+                android:hint="Enter Recipe Description"
+                android:inputType="textMultiLine"
+                android:minLines="2"
+                android:textColorHint="#000"
+                android:textColor="#000"
+                android:backgroundTint="#000"/>
+
+            <Button
+                android:id="@+id/buttonSelectIngredients"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/editTextRecipeDescription"
+                android:text="Add Ingredients"
+                android:layout_marginTop="16dp"/>
+
+            <TextView
+                android:id="@+id/textInstructionsTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Instructions"
+                android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                android:layout_below="@id/buttonSelectIngredients"
+                android:layout_marginTop="16dp"
+                android:textColorHint="#000"
+                android:textColor="#000"
+                android:backgroundTint="#000"/>
+
+            <EditText
+                android:id="@+id/editTextInstructions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/textInstructionsTitle"
+                android:hint="Detailed instructions (max 1000 chars)"
+                android:inputType="textMultiLine"
+                android:minLines="6"
+                android:textColorHint="#000"
+                android:textColor="#000"
+                android:backgroundTint="#000"
+            android:gravity="top|start"
+            android:padding="8dp"
+            android:scrollbars="vertical"
+            android:overScrollMode="ifContentScrolls"
+            android:maxLength="1000"
+            android:layout_marginTop="8dp"/>
+
+
+            <Button
+                android:id="@+id/buttonAddRecipe"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Add Recipe"
+                android:layout_below="@id/editTextInstructions"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="16dp" />
+
+        </RelativeLayout>
+    </ScrollView>
+
+    <!-- Drawer for ingredient selection -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/ingredientDrawer"
+        android:layout_width="240dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="end"
+        android:background="@android:color/white" />
+
+</androidx.drawerlayout.widget.DrawerLayout>

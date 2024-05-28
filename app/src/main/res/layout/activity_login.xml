@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    tools:context=".ui.PreMain.LoginActivity"
+    android:id="@+id/main">
+
+    <!-- Logo -->
+    <TextView
+        android:id="@+id/logo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="80dp"
+        android:text="Délice"
+        android:textColor="#000"
+        android:textSize="100sp"
+        android:fontFamily="@font/lovers_quarrel" />
+
+    <!-- Username Field -->
+    <EditText
+        android:id="@+id/username"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/logo"
+        android:layout_marginTop="48dp"
+        android:backgroundTint="#000"
+        android:fontFamily="@font/alice"
+        android:hint="Username"
+        android:textColor="#000"
+        android:textColorHint="#000" />
+
+    <!-- Password Field -->
+    <EditText
+        android:id="@+id/password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/username"
+        android:layout_marginTop="24dp"
+        android:hint="Password"
+        android:inputType="textPassword"
+        android:textColorHint="#000"
+        android:textColor="#000"
+        android:backgroundTint="#000"
+        android:fontFamily="@font/alice" />
+
+    <!-- Login Button -->
+    <Button
+        android:id="@+id/loginButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/password"
+        android:layout_marginTop="32dp"
+        android:layout_marginHorizontal="10dp"
+        android:text="Login"
+        android:textColor="#FFFFFF"
+        android:background="#000000"
+        android:fontFamily="@font/alice" />
+
+    <!-- Sign Up Link -->
+    <TextView
+        android:id="@+id/signupLink"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/loginButton"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        android:text="Don't have an account? Sign up"
+        android:textColor="#000"
+        android:clickable="true"
+        android:focusable="true"
+        android:textSize="16sp"
+        android:fontFamily="@font/alice" />
+
+</RelativeLayout>

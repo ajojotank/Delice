@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_home"
+        android:icon="@drawable/home"
+        android:title="Home" />
+
+    <item
+        android:id="@+id/navigation_GroceryList"
+        android:icon="@drawable/grocerylist"
+        android:title="Grocery List" />
+
+    <item
+        android:id="@+id/navigation_search"
+        android:icon="@drawable/search"
+        android:title="Search" />
+
+    <item
+        android:id="@+id/navigation_recipeBook"
+        android:icon="@drawable/recipebook"
+        android:title="Recipe Book" />
+
+    <item
+        android:id="@+id/navigation_friends"
+        android:icon="@drawable/friends"
+        android:title="Friends" />
+
+</menu>

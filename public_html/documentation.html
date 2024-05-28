@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>API Documentation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        h2 {
+            color: #555;
+        }
+        code {
+            background-color: #f4f4f4;
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+        pre {
+            background-color: #f4f4f4;
+            padding: 10px;
+            border-radius: 4px;
+            overflow: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>API Documentation</h1>
+    <p>This document provides information on how to use the API endpoints with example cURL commands.</p>
+
+    <h2>User Endpoints</h2>
+
+    <h3>Login User</h3>
+    <p>Logs in a user by checking username and password hash.</p>
+    <pre><code>POST /login</code></pre>
+    <p>Example cURL command:</p>
+    <pre><code>curl -X POST -d "username=chefjoash&password=hash1" https://lamp.ms.wits.ac.za/home/s2670867/login.php</code></pre>
+
+    <h3>Register User</h3>
+    <p>Registers a new user with username, name, and password.</p>
+    <pre><code>POST /register</code></pre>
+    <p>Example cURL command:</p>
+    <pre><code>curl -X POST -d "username=newuser&name=New User&password=newpassword" https://lamp.ms.wits.ac.za/home/s2670867/register.php</code></pre>
+
+    <h2>Recipe Endpoints</h2>
+
+    <h3>Get All Recipes</h3>
+    <p>Retrieves all recipes with their details.</p>
+    <pre><code>GET /recipes</code></pre>
+    <p>Example cURL command:</p>
+    <pre><code>curl -X GET https://lamp.ms.wits.ac.za/home/s2670867/get_recipes.php</code></pre>
+
+    <h3>Get Recipe by ID</h3>
+    <p>Retrieves a single recipe by its ID.</p>
+    <pre><code>GET /recipes/{id}</code></pre>
+    <p>Example cURL command:</p>
+    <pre><code>curl -X GET https://lamp.ms.wits.ac.za/home/s2670867/get_recipe_by_id.php?id=1</code></pre>
+
+    <h3>Add New Recipe</h3>
+    <p>Adds a new recipe to the database.</p>
+    <pre><code>POST /recipes</code></pre>
+    <p>Example cURL command:</p>
+    <pre><code>curl -X POST -F "title=New Recipe" -F "description=Delicious new recipe" -F "author_id=1" -F "imageFile=@/path/to/image.jpg" https://lamp.ms.wits.ac.za/home/s2670867/add_recipe.php</code></pre>
+
+    <h2>Ingredient Endpoints</h2>
+
+    <h3>Get All Ingredients</h3>
+    <p>Retrieves all ingredients.</p>
+    <pre><code>GET /ingredients</code></pre>
+    <p>Example cURL command:</p>
+    <pre><code>curl -X GET https://lamp.ms.wits.ac.za/home/s2670867/get_ingredients.php</code></pre>
+
+    <h2>Meal Planning Endpoints</h2>
+
+    <h3>Get Meals for User</h3>
+    <p>Retrieves all meals planned for a specific user.</p>
+    <pre><code>GET /meals/{user_id}</code></pre>
+    <p>Example cURL command:</p>
+    <pre><code>curl -X GET https://lamp.ms.wits.ac.za/home/s2670867/get_meals_for_user.php?user_id=1</code></pre>
+
+    <h3>Add Meal to Planner</h3>
+    <p>Adds a meal to a user's meal planner.</p>
+    <pre><code>POST /meals</code></pre>
+    <p>Example cURL command:</p>
+    <pre><code>curl -X POST -d "user_id=1&recipe_id=1&day=Mon&meal_type=Lunch" https://lamp.ms.wits.ac.za/home/s2670867/add_meal.php</code></pre>
+
+    <h3>Delete Meal</h3>
+    <p>Deletes a meal from the meal planner.</p>
+    <pre><code>DELETE /meals/{id}</code></pre>
+    <p>Example cURL command:</p>
+    <pre><code>curl -X DELETE https://lamp.ms.wits.ac.za/home/s2670867/delete_meal.php?id=1</code></pre>
+
+    <h2>Friends Endpoints</h2>
+
+    <h3>Get Friends List</h3>
+    <p>Retrieves a list of friends for a user.</p>
+    <pre><code>GET /friends/{user_id}</code></pre>
+    <p>Example cURL command:</p>
+    <pre><code>curl -X GET https://lamp.ms.wits.ac.za/home/s2670867/get_friends_list.php?user_id=1</code></pre>
+
+    <h3>Add Friend</h3>
+    <p>Adds a new friend connection.</p>
+    <pre><code>POST /friends</code></pre>
+    <p>Example cURL command:</p>
+    <pre><code>curl -X POST -d "user_id=1&friend_id=2" https://lamp.ms.wits.ac.za/home/s2670867/add_friend.php</code></pre>
+
+    <h3>Delete Friend</h3>
+    <p>Removes a friend connection.</p>
+    <pre><code>DELETE /friends/{id}</code></pre>
+    <p>Example cURL command:</p>
+    <pre><code>curl -X DELETE https://lamp.ms.wits.ac.za/home/s2670867/delete_friend.php?id=2</code></pre>
+
+    <h2>Favorites Endpoints</h2>
+
+    <h3>Get User Favorites</h3>
+    <p>Retrieves all favorite recipes of a user.</p>
+    <pre><code>GET /favorites/{user_id}</code></pre>
+    <p>Example cURL command:</p>
+    <pre><code>curl -X GET https://lamp.ms.wits.ac.za/home/s2670867/get_user_favorites.php?user_id=1</code></pre>
+
+    <h3>Add Favorite Recipe</h3>
+    <p>Adds a recipe to a user's favorites.</p>
+    <pre><code>POST /favorites</code></pre>
+    <p>Example cURL command:</p>
+    <pre><code>curl -X POST -d "user_id=1&recipe_id=1" https://lamp.ms.wits.ac.za/home/s2670867/add_favorite_recipe.php</code></pre>
+
+    <h3>Remove Favorite Recipe</h3>
+    <p>Removes a recipe from user's favorites.</p>
+    <pre><code>DELETE /favorites/{id}</code></pre>
+    <p>Example cURL command:</p>
+    <pre><code>curl -X DELETE https://lamp.ms.wits.ac.za/home/s2670867/remove_favorite_recipe.php?id=3</code></pre>
+
+    <h2>Search Endpoint</h2>
+
+    <h3>Search Recipes</h3>
+    <p>Allows searching recipes by title or ingredients.</p>
+    <pre><code>GET /search</code></pre>
+    <p>Example cURL command:</p>
+    <pre><code>curl -X GET https://lamp.ms.wits.ac.za/home/s2670867/search_recipes.php?query=chicken</code></pre>
+
+</body>
+</html>

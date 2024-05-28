@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.PreMain.OnboardingActivity"
+    android:id="@+id/main"
+    android:fitsSystemWindows="false">
+
+    <!-- Background image -->
+    <ImageView
+        android:id="@+id/backgroundImage"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/onboarding"
+        android:contentDescription="background image" />
+
+    <!-- Black tint overlay -->
+    <View
+        android:id="@+id/blackTintOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#80000000" /> <!-- 50% opacity black -->
+
+    <!-- App name in Lovers Quarrel font -->
+    <TextView
+        android:id="@+id/appName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="80dp"
+        android:fontFamily="@font/lovers_quarrel"
+        android:text="Délice"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
+        android:textSize="100sp" />
+
+    <!-- Subtitle text -->
+    <TextView
+        android:id="@+id/subtitleText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/appName"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="242dp"
+        android:fontFamily="@font/alice"
+        android:text="Lets get cooking"
+        android:textColor="#FFFFFF"
+        android:textSize="37sp" />
+
+    <!-- Let's Go button with arrow -->
+    <Button
+        android:id="@+id/startButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/subtitleText"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="100dp"
+        android:background="@color/material_dynamic_neutral100"
+        android:fontFamily="@font/alice"
+        android:text="Lets go"
+        android:textColor="#FFFFFF"
+        android:textSize="17sp"
+        android:drawableEnd="@drawable/letsgo"
+        android:textColorHint="#fff"
+        android:drawableTint="#fff"
+        android:paddingEnd="16dp"
+        android:drawablePadding="8dp" />
+
+</RelativeLayout>

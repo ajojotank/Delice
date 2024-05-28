@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Heading displaying the user's name and cookbook title -->
+    <TextView
+        android:id="@+id/textCookbookTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Username's Cookbook"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:padding="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/buttonAddRecipe"
+        app:layout_constraintHorizontal_bias="0.0"/>
+
+    <!-- Button to add new recipes, visibility can be toggled -->
+    <Button
+        android:id="@+id/buttonAddRecipe"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:text="Add Recipe"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/textCookbookTitle"
+        android:layout_marginEnd="16dp"/>
+
+    <!-- RecyclerView to display the list of recipes -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recipesRecyclerView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@id/textCookbookTitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="57dp"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
