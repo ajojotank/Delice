@@ -51,13 +51,6 @@ public class FriendsFragment extends Fragment {
 
         return binding.getRoot();
     }
-    public void onUnfriendClick(int position) {
-        // Handle unfriend action here
-        // For example, remove the friend from the list and notify adapter
-        friendsList.remove(position);
-        adapter.notifyItemRemoved(position);
-    }
-
 
     private void setupFriendsRecyclerView() {
         friendsList = new ArrayList<>();
@@ -79,10 +72,10 @@ public class FriendsFragment extends Fragment {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         Handler handler = new Handler(Looper.getMainLooper());
         LoginController appController = (LoginController) getActivity().getApplicationContext();
+        String userId = appController.getUserId();
 
         executorService.execute(() -> {
             try {
-                // Replace with your server URL
                 URL url = new URL("https://lamp.ms.wits.ac.za/home/s2670867/get_user.php?username=" + username);
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
@@ -91,10 +84,11 @@ public class FriendsFragment extends Fragment {
                 String response = convertStreamToString(in);
                 Log.d("searchUser", "Response: " + response);
 
-                JSONObject jsonObject = new JSONObject(response);
+                JSONArray jsonArray = new JSONArray(response);
+                JSONObject jsonObject = jsonArray.getJSONObject(0);
                 if (jsonObject.has("user_id")) {
-                    int friendId = jsonObject.getInt("user_id");
-                    int currentUserId = Integer.parseInt(appController.getUserId());
+                    String friendId = jsonObject.getString("user_id");
+                    String currentUserId = appController.getUserId();
                     addFriendToDatabase(currentUserId, friendId);
                 } else {
                     handler.post(() -> Snackbar.make(binding.getRoot(), "User does not exist", Snackbar.LENGTH_SHORT).show());
@@ -107,7 +101,7 @@ public class FriendsFragment extends Fragment {
         });
     }
 
-    private void addFriendToDatabase(int userId, int friendId) {
+    private void addFriendToDatabase(String userId, String friendId) {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         Handler handler = new Handler(Looper.getMainLooper());
 
@@ -149,7 +143,7 @@ public class FriendsFragment extends Fragment {
         executorService.execute(() -> {
             try {
                 // Replace with your server URL
-                URL url = new URL("https://lamp.ms.wits.ac.za/home/s2670867/get_friends.php?user_id=" + appController.getUserId());
+                URL url = new URL("https://lamp.ms.wits.ac.za/home/s2670867/get_friends_list.php?user_id=" + appController.getUserId());
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
 
@@ -161,20 +155,21 @@ public class FriendsFragment extends Fragment {
                 List<Friend> friends = new ArrayList<>();
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject jsonObject = jsonArray.getJSONObject(i);
-                    int friendId = jsonObject.getInt("friend_id");
+                    String friendId = jsonObject.getString("friend_id");
+                    String friendUsername = jsonObject.getString("friend_username");
+                    String friendName = jsonObject.getString("friend_name");
+                    Friend friend = new Friend(friendId,friendUsername,friendName);
+                    friends.add(friend);
 
-                    // Assuming you have a method to get friend details by ID
-                    Friend friend = getFriendDetailsById(friendId);
-                    if (friend != null) {
-                        friends.add(friend);
-                    }
                 }
 
-                handler.post(() -> {
-                    friendsList.clear();
-                    friendsList.addAll(friends);
-                    adapter.notifyDataSetChanged();
-                });
+                if (!friends.isEmpty()) {
+                    handler.post(() -> {
+                        friendsList.clear();
+                        friendsList.addAll(friends);
+                        adapter.notifyDataSetChanged();
+                    });
+                }
 
                 urlConnection.disconnect();
             } catch (Exception e) {
@@ -183,16 +178,16 @@ public class FriendsFragment extends Fragment {
         });
     }
 
-    private Friend getFriendDetailsById(int friendId) {
-        // Dummy method to simulate fetching friend details
-        // In reality, you might fetch this data from another API or local database
-        Map<Integer, Friend> dummyFriends = new HashMap<>();
-        dummyFriends.put(1, new Friend("John Doe", "johndoe123"));
-        dummyFriends.put(2, new Friend("Jane Smith", "janesmith456"));
-        dummyFriends.put(3, new Friend("Emily Johnson", "emilyjohnson789"));
-
-        return dummyFriends.get(friendId);
-    }
+//    private Friend getFriendDetailsById(int friendId) {
+//        // Dummy method to simulate fetching friend details
+//        // In reality, you might fetch this data from another API or local database
+//        Map<Integer, Friend> dummyFriends = new HashMap<>();
+//        dummyFriends.put(1, new Friend("John Doe", "johndoe123"));
+//        dummyFriends.put(2, new Friend("Jane Smith", "janesmith456"));
+//        dummyFriends.put(3, new Friend("Emily Johnson", "emilyjohnson789"));
+//
+//        return dummyFriends.get(friendId);
+//    }
 
     private String convertStreamToString(InputStream is) {
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));

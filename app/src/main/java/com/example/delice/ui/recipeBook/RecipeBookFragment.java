@@ -97,10 +97,7 @@ public class RecipeBookFragment extends Fragment {
 
         executorService.execute(() -> {
             try {
-                //URL url = new URL("https://lamp.ms.wits.ac.za/home/s2670867/get_user_favorites.php?user_id=");
-                //HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-                //urlConnection.setRequestMethod("GET");
-                URL url = new URL("https://lamp.ms.wits.ac.za/home/s2670867/get_ingredients.php");
+                URL url = new URL("https://lamp.ms.wits.ac.za/home/s2670867/get_user_favorites.php?user_id="+userId);
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
 
@@ -114,8 +111,8 @@ public class RecipeBookFragment extends Fragment {
                     JSONObject recipeJson = jsonArray.getJSONObject(i);
                     String title = recipeJson.getString("title");
                     String description = recipeJson.getString("description");
-                    String author = recipeJson.getString("author_name"); // Assuming author_id is sufficient for now
-                    String imageUrl = recipeJson.getString("image_path");
+                    String author = recipeJson.getString("author"); // Assuming author_id is sufficient for now
+                    String imageUrl = recipeJson.getString("image_url");
 
                     List<String> ingredients = new ArrayList<>();
                     if (recipeJson.has("ingredients")) {
@@ -137,7 +134,7 @@ public class RecipeBookFragment extends Fragment {
                 }
 
                 handler.post(() -> {
-                    recipeCardAdapter = new RecipeCardAdapter(recipes);
+                    recipeCardAdapter = new RecipeCardAdapter(recipes, appController);
                     binding.recipesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
                     binding.recipesRecyclerView.setAdapter(recipeCardAdapter);
                 });

@@ -64,7 +64,7 @@ public class LoginActivity extends AppCompatActivity {
                         JSONObject jsonResponse = new JSONObject(response);
                         if (jsonResponse.getBoolean("success")) {
                             String userId = jsonResponse.getString("user_id"); // Extract user_id from the response
-                            LoginController appController = (LoginController) getApplicationContext();
+                            LoginController appController = (LoginController)getApplicationContext();
                             appController.setLogged(true);
                             appController.setUserId(userId); // Store user_id in LoginController
 

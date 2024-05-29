@@ -1,6 +1,7 @@
 package com.example.delice.ui.recipe;
 
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,15 +12,33 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.delice.R;
+import com.example.delice.utilities.LoginController;
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class RecipeCardAdapter extends RecyclerView.Adapter<RecipeCardAdapter.RecipeViewHolder> {
     private List<Recipe> recipes;
+    private static final String TAG = "RecipeCardAdapter";
 
-    public RecipeCardAdapter(List<Recipe> recipes) {
+    private final LoginController loginController;
+
+    public RecipeCardAdapter(List<Recipe> recipes, LoginController loginController) {
         this.recipes = recipes;
+        this.loginController = loginController;
     }
 
     @NonNull
@@ -35,6 +54,9 @@ public class RecipeCardAdapter extends RecyclerView.Adapter<RecipeCardAdapter.Re
         holder.title.setText(recipe.getTitle());
         holder.description.setText(recipe.getDescription());
         holder.author.setText("Recipe by: " + recipe.getAuthor());
+        if (recipe.isFavourite()){
+            holder.favorite.setImageResource(R.drawable.favourite);
+        }
 
         // Using Picasso to load the image from URL
         Picasso.get().load(recipe.getImageURL()).into(holder.image);
@@ -50,6 +72,7 @@ public class RecipeCardAdapter extends RecyclerView.Adapter<RecipeCardAdapter.Re
         holder.favorite.setOnClickListener(v -> {
             boolean isNowFavorite = !recipe.isFavourite();
             recipe.toggleFavourite();
+            updateFavoriteDataBind(isNowFavorite,recipe.getTitle());
             updateFavoriteIcon(holder.favorite, isNowFavorite);
         });
     }
@@ -62,6 +85,72 @@ public class RecipeCardAdapter extends RecyclerView.Adapter<RecipeCardAdapter.Re
         }
     }
 
+    private void updateFavoriteDataBind(boolean isFavorite, String recipeName) {
+        String userId = loginController.getUserId();
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        executorService.execute(() -> {
+
+            String recipeId = "";
+
+
+            try {
+                URL url = new URL("https://lamp.ms.wits.ac.za/home/s2670867/get_recipeID.php?name="+ recipeName);
+                HttpURLConnection urlConnection = (HttpURLConnection)url.openConnection();
+                urlConnection.setRequestMethod("GET");
+
+                InputStream in = new BufferedInputStream(urlConnection.getInputStream());
+                String response = convertStreamToString(in);
+                Log.d("setupRecyclerView", "Response: " + response);
+
+                JSONArray jsonArray = new JSONArray(response);
+                JSONObject jsonObject = jsonArray.getJSONObject(0);
+                recipeId = jsonObject.getString("recipe_id");
+
+            } catch (Exception e) {
+                Log.e("setupRecyclerView", "Error getting recipesID", e);
+            }
+
+            try {
+                if (!isFavorite) {
+                    // Removing from favorites
+                    URL url = new URL("https://lamp.ms.wits.ac.za/home/s2670867/remove_favorite_recipe.php?user_id=" + userId + "&recipe_id=" + recipeId);
+                    HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                    urlConnection.setRequestMethod("GET");
+
+                    InputStream in = new BufferedInputStream(urlConnection.getInputStream());
+                    String response = convertStreamToString(in);
+                    Log.d(TAG, "Response: " + response);
+
+                    JSONObject jsonResponse = new JSONObject(response);
+                    boolean success = jsonResponse.getBoolean("success");
+
+                    urlConnection.disconnect();
+                } else {
+                    // Adding to favorites
+                    URL url = new URL("https://lamp.ms.wits.ac.za/home/s2670867/add_favorite_recipe.php?user_id=" + userId + "&recipe_id=" + recipeId);
+                    HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                    urlConnection.setRequestMethod("GET");
+
+                    InputStream in = new BufferedInputStream(urlConnection.getInputStream());
+                    String response = convertStreamToString(in);
+                    Log.d(TAG, "Response: " + response);
+
+                    JSONObject jsonResponse = new JSONObject(response);
+                    boolean success = jsonResponse.getBoolean("success");
+
+                    JSONArray jsonArray = new JSONArray(response);
+                    ArrayList<Recipe> recipes = new ArrayList<>();
+
+                    urlConnection.disconnect();
+                }
+
+            } catch (Exception e) {
+                Log.e(TAG, "Error updating favorite status", e);
+            }
+        });
+
+    }
+
     @Override
     public int getItemCount() {
         return recipes != null ? recipes.size() : 0;
@@ -71,11 +160,10 @@ public class RecipeCardAdapter extends RecyclerView.Adapter<RecipeCardAdapter.Re
         this.recipes = newRecipes;
         notifyDataSetChanged();
     }
-
     public static class RecipeViewHolder extends RecyclerView.ViewHolder {
         TextView title, description, author;
-        ImageView image, favorite;
 
+        ImageView image, favorite;
         RecipeViewHolder(View itemView) {
             super(itemView);
             title = itemView.findViewById(R.id.textRecipeTitle);
@@ -84,5 +172,25 @@ public class RecipeCardAdapter extends RecyclerView.Adapter<RecipeCardAdapter.Re
             image = itemView.findViewById(R.id.imageRecipe);
             favorite = itemView.findViewById(R.id.imageFavorite);
         }
+
+    }
+    private static String convertStreamToString(InputStream is) {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        StringBuilder sb = new StringBuilder();
+        String line;
+        try {
+            while ((line = reader.readLine()) != null) {
+                sb.append(line).append('\n');
+            }
+        } catch (IOException e) {
+            Log.e("convertStreamToString", "Error reading stream", e);
+        } finally {
+            try {
+                is.close();
+            } catch (IOException e) {
+                Log.e("convertStreamToString", "Error closing stream", e);
+            }
+        }
+        return sb.toString();
     }
 }

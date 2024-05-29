@@ -134,7 +134,7 @@ public class AddMealActivity extends AppCompatActivity {
     private void addMealToUserPlan(Meal meal, String day, String mealType) {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         executorService.execute(() -> {
-            LoginController appController = (LoginController) getApplicationContext();
+            LoginController appController = (LoginController)getApplicationContext();
             String userId = appController.getUserId();
 
             try {

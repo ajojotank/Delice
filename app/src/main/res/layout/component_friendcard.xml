@@ -36,13 +36,5 @@
             android:textSize="14sp"
             tools:text="@string/username" />
 
-        <Button
-            android:id="@+id/unfriendButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/friendName"
-            android:layout_alignParentEnd="true"
-            android:text="Unfriend"
-            android:onClick="onUnfriendClicked" />
     </RelativeLayout>
 </androidx.cardview.widget.CardView>

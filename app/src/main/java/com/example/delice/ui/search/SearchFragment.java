@@ -22,6 +22,8 @@ import com.example.delice.R;
 import com.example.delice.databinding.FragmentSearchBinding;
 import com.example.delice.ui.recipe.Recipe;
 import com.example.delice.ui.recipe.RecipeCardAdapter;
+import com.example.delice.utilities.IsFavoriteRecipe;
+import com.example.delice.utilities.LoginController;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -46,6 +48,7 @@ public class SearchFragment extends Fragment {
     private List<Recipe> allRecipes;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         binding = FragmentSearchBinding.inflate(inflater, container, false);
 
         // Setup RecyclerViews and the filter drawer
@@ -123,6 +126,12 @@ public class SearchFragment extends Fragment {
     private void setupRecyclerView() {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         Handler handler = new Handler(Looper.getMainLooper());
+        LoginController appController = (LoginController)getActivity().getApplicationContext();
+        //String userId = new LoginController().getUserId(getContext());
+        String userId = appController.getUserId();
+
+
+        Log.d("...","this is the logged in user: " + userId);
 
         executorService.execute(() -> {
             try {
@@ -142,6 +151,8 @@ public class SearchFragment extends Fragment {
                     String description = recipeJson.getString("description");
                     String author = recipeJson.getString("author_name"); // Assuming author_id is sufficient for now
                     String imageUrl = recipeJson.getString("image_path");
+                    String recipeId = recipeJson.getString("recipe_id");
+                    boolean isFavorite = IsFavoriteRecipe.getIsFavorite(userId, recipeId);
 
                     List<String> ingredients = new ArrayList<>();
                     if (recipeJson.has("ingredients")) {
@@ -159,11 +170,11 @@ public class SearchFragment extends Fragment {
                         }
                     }
 
-                    recipes.add(new Recipe(title, description, false, ingredients, instructions, author, imageUrl));
+                    recipes.add(new Recipe(title, description, isFavorite, ingredients, instructions, author, imageUrl));
                 }
 
                 handler.post(() -> {
-                    recipeCardAdapter = new RecipeCardAdapter(recipes);
+                    recipeCardAdapter = new RecipeCardAdapter(recipes, appController);
                     binding.searchResultsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
                     binding.searchResultsRecyclerView.setAdapter(recipeCardAdapter);
                     allRecipes = recipes;

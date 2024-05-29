@@ -53,4 +53,5 @@ public class Recipe implements Serializable{
     public void toggleFavourite() {
         this.favourite = !this.favourite; // Toggle the state
     }
+
 }

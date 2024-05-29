@@ -4,7 +4,6 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -17,20 +16,14 @@ import java.util.List;
 public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendViewHolder> {
     private List<Friend> friendsList;
     private OnFriendClickListener listener;
-    private OnUnfriendClickListener unfriendListener;
 
     public interface OnFriendClickListener {
         void onFriendClick(Friend friend);
     }
 
-    public interface OnUnfriendClickListener {
-        void onUnfriendClick(int position);
-    }
-
     public FriendsAdapter(Context context, List<Friend> friendsList, OnFriendClickListener listener) {
         this.friendsList = friendsList;
         this.listener = listener;
-        this.unfriendListener = unfriendListener;
     }
 
     @NonNull
@@ -45,11 +38,6 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendVi
         Friend friend = friendsList.get(position);
         holder.nameTextView.setText(friend.getName());
         holder.usernameTextView.setText(friend.getUsername());
-        holder.unfriendButton.setOnClickListener(v -> {
-            if (unfriendListener != null) {
-                unfriendListener.onUnfriendClick(position);
-            }
-        });
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) {
                 listener.onFriendClick(friend);
@@ -64,13 +52,11 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendVi
 
     static class FriendViewHolder extends RecyclerView.ViewHolder {
         TextView nameTextView, usernameTextView;
-        Button unfriendButton;
 
         public FriendViewHolder(@NonNull View itemView) {
             super(itemView);
             nameTextView = itemView.findViewById(R.id.friendName);
             usernameTextView = itemView.findViewById(R.id.friendUsername);
-            unfriendButton = itemView.findViewById(R.id.unfriendButton);
         }
     }
 }
