@@ -4,11 +4,15 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.widget.EditText;
+
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
@@ -48,8 +52,28 @@ public class SearchFragment extends Fragment {
         setupIngredientFilter();
         setupRecyclerView();
         setupSearch();
+        onSearch();
 
         return binding.getRoot();
+
+
+    }
+
+    //Kaylas search function
+    public void onSearch(){
+        EditText searchInput = binding.searchInput;
+        searchInput.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if ((event.getAction()==KeyEvent.ACTION_DOWN)&&(keyCode == KeyEvent.KEYCODE_ENTER)){
+                    setupSearch();
+
+                    return true;
+                }
+                return false;
+            }
+        });
+
     }
 
     private void setupIngredientFilter() {
@@ -197,4 +221,6 @@ public class SearchFragment extends Fragment {
         super.onDestroyView();
         binding = null;
     }
+
+
 }

@@ -2,25 +2,54 @@ package com.example.delice.ui.recipeBook;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.example.delice.R;
 import com.example.delice.databinding.FragmentRecipebookBinding;
+import com.example.delice.databinding.FragmentSearchBinding;
 import com.example.delice.ui.recipe.Recipe;
 import com.example.delice.ui.recipe.RecipeCardAdapter;
+import com.example.delice.ui.search.IngredientFilterAdapter;
+import com.example.delice.utilities.LoginController;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 
 public class RecipeBookFragment extends Fragment {
 
     private FragmentRecipebookBinding binding;
     private boolean viewingOwnCookbook = true;
+    private RecipeCardAdapter recipeCardAdapter;
 
     // Use a static method to create the fragment with arguments
     public static RecipeBookFragment newInstance(boolean isUserCookbook) {
@@ -37,6 +66,7 @@ public class RecipeBookFragment extends Fragment {
         if (getArguments() != null) {
             viewingOwnCookbook = getArguments().getBoolean("viewingOwnCookbook", true);
         }
+
     }
 
     @Override
@@ -60,40 +90,82 @@ public class RecipeBookFragment extends Fragment {
     }
 
     private void setupRecyclerView() {
-        ArrayList<Recipe> recipes = new ArrayList<>(); // This should be replaced with actual data retrieval logic
-        recipes.add(new Recipe(
-                "Breakfast: Oatmeal",
-                "Oatmeal with honey, fruits and nuts",
-                true,  // Favourite
-                Arrays.asList("1 cup oatmeal", "1 tbsp honey", "1/2 cup mixed fruits", "1/4 cup nuts"),
-                Arrays.asList("Boil water or milk", "Add oatmeal and cook for 5 minutes", "Mix in honey, fruits, and nuts before serving"),
-                "Joash Paul",
-                "https://images.pexels.com/photos/90894/pexels-photo-90894.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-        ));
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        Handler handler = new Handler(Looper.getMainLooper());
+        LoginController appController = (LoginController) getActivity().getApplicationContext();
+        String userId = appController.getUserId();
 
-        recipes.add(new Recipe(
-                "Lunch: Chicken Salad",
-                "Grilled chicken salad with vinaigrette",
-                true,  // Not favourite
-                Arrays.asList("200g chicken breast", "Mixed greens", "2 tbsp olive oil", "1 tbsp vinegar"),
-                Arrays.asList("Grill the chicken until cooked", "Toss the greens in olive oil and vinegar", "Top with sliced chicken"),
-                "Camilla Driks",
-                "https://images.pexels.com/photos/764925/pexels-photo-764925.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-        ));
+        executorService.execute(() -> {
+            try {
+                //URL url = new URL("https://lamp.ms.wits.ac.za/home/s2670867/get_user_favorites.php?user_id=");
+                //HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                //urlConnection.setRequestMethod("GET");
+                URL url = new URL("https://lamp.ms.wits.ac.za/home/s2670867/get_ingredients.php");
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setRequestMethod("GET");
 
-        recipes.add(new Recipe(
-                "Dinner: Pasta",
-                "Pasta with marinara sauce and basil",
-                true,  // Favourite
-                Arrays.asList("200g pasta", "100g marinara sauce", "Fresh basil", "Parmesan cheese"),
-                Arrays.asList("Cook pasta according to package instructions", "Heat sauce over medium flame", "Combine pasta and sauce", "Garnish with basil and parmesan"),
-                "Aimee Harding",
-                "https://images.pexels.com/photos/1487511/pexels-photo-1487511.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-        ));
+                InputStream in = new BufferedInputStream(urlConnection.getInputStream());
+                String response = convertStreamToString(in);
+                Log.d("setupRecyclerView", "Response: " + response);
 
-        RecipeCardAdapter adapter = new RecipeCardAdapter(recipes);
-        binding.recipesRecyclerView.setAdapter(adapter);
-        binding.recipesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+                JSONArray jsonArray = new JSONArray(response);
+                ArrayList<Recipe> recipes = new ArrayList<>();
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject recipeJson = jsonArray.getJSONObject(i);
+                    String title = recipeJson.getString("title");
+                    String description = recipeJson.getString("description");
+                    String author = recipeJson.getString("author_name"); // Assuming author_id is sufficient for now
+                    String imageUrl = recipeJson.getString("image_path");
+
+                    List<String> ingredients = new ArrayList<>();
+                    if (recipeJson.has("ingredients")) {
+                        JSONArray ingredientsArray = recipeJson.getJSONArray("ingredients");
+                        for (int j = 0; j < ingredientsArray.length(); j++) {
+                            ingredients.add(ingredientsArray.getString(j));
+                        }
+                    }
+
+                    List<String> instructions = new ArrayList<>();
+                    if (recipeJson.has("instructions")) {
+                        JSONArray instructionsArray = recipeJson.getJSONArray("instructions");
+                        for (int j = 0; j < instructionsArray.length(); j++) {
+                            instructions.add(instructionsArray.getString(j));
+                        }
+                    }
+
+                    recipes.add(new Recipe(title, description, false, ingredients, instructions, author, imageUrl));
+                }
+
+                handler.post(() -> {
+                    recipeCardAdapter = new RecipeCardAdapter(recipes);
+                    binding.recipesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+                    binding.recipesRecyclerView.setAdapter(recipeCardAdapter);
+                });
+
+                urlConnection.disconnect();
+            } catch (Exception e) {
+                Log.e("setupRecyclerView", "Error fetching recipes", e);
+            }
+        });
+    }
+    private String convertStreamToString(InputStream is) {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        StringBuilder sb = new StringBuilder();
+        String line;
+        try {
+            while ((line = reader.readLine()) != null) {
+                sb.append(line).append('\n');
+            }
+        } catch (IOException e) {
+            Log.e("convertStreamToString", "Error reading stream", e);
+        } finally {
+            try {
+                is.close();
+            } catch (IOException e) {
+                Log.e("convertStreamToString", "Error closing stream", e);
+            }
+        }
+        return sb.toString();
     }
 
     @Override

@@ -10,7 +10,7 @@
         android:id="@+id/textCookbookTitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Username's Cookbook"
+        android:text="My Cookbook"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         android:padding="16dp"
         app:layout_constraintStart_toStartOf="parent"

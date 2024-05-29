@@ -16,15 +16,18 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:hint="Search recipes"
+            android:imeOptions="actionSearch"
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:textColorHint="#000"
             android:textColor="#000"
             android:backgroundTint="#000"
+            android:inputType="text"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toStartOf="@id/filterButton"
             app:layout_constraintWidth_percent="0.8"/>
+
 
         <ImageView
             android:id="@+id/filterButton"
