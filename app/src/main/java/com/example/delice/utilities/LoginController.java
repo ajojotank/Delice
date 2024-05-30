@@ -16,6 +16,8 @@ public class LoginController extends Application {
     public void onCreate() {
         super.onCreate();
         // Initialize global variables or services here if needed
+        setLogged(false);
+
     }
 
     public boolean isLogged() {

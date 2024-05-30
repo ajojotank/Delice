@@ -55,6 +55,8 @@ public class MealCardAdapter extends RecyclerView.Adapter<MealCardAdapter.MealVi
         TextView description;
         TextView author;
         ImageView image;
+        ImageView favorite;
+
 
         MealViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -62,6 +64,9 @@ public class MealCardAdapter extends RecyclerView.Adapter<MealCardAdapter.MealVi
             description = itemView.findViewById(R.id.textRecipeDescription);
             author = itemView.findViewById(R.id.textRecipeAuthor);
             image = itemView.findViewById(R.id.imageRecipe);
+            favorite = itemView.findViewById(R.id.imageFavorite);
+
+
         }
 
         void bind(Meal meal, OnItemClickListener onItemClickListener) {
@@ -69,7 +74,7 @@ public class MealCardAdapter extends RecyclerView.Adapter<MealCardAdapter.MealVi
             description.setText(meal.getDescription());
             author.setText("Recipe by: " + meal.getAuthor());
             Picasso.get().load(meal.getImageUrl()).into(image);
-
+            favorite.setVisibility(View.INVISIBLE);
             itemView.setOnClickListener(v -> onItemClickListener.onItemClick(meal));
         }
     }

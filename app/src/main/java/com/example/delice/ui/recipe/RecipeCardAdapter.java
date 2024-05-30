@@ -7,11 +7,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.delice.R;
+import com.example.delice.utilities.IsFavoriteRecipe;
 import com.example.delice.utilities.LoginController;
 import com.squareup.picasso.Picasso;
 
@@ -54,6 +56,10 @@ public class RecipeCardAdapter extends RecyclerView.Adapter<RecipeCardAdapter.Re
         holder.title.setText(recipe.getTitle());
         holder.description.setText(recipe.getDescription());
         holder.author.setText("Recipe by: " + recipe.getAuthor());
+
+
+        Log.e("making recipe card","making recipe card for: "+recipe.getTitle());
+        Log.e("checking is fav","This recipe is a fav: "+recipe.isFavourite());
         if (recipe.isFavourite()){
             holder.favorite.setImageResource(R.drawable.favourite);
         }
@@ -85,14 +91,13 @@ public class RecipeCardAdapter extends RecyclerView.Adapter<RecipeCardAdapter.Re
         }
     }
 
+
     private void updateFavoriteDataBind(boolean isFavorite, String recipeName) {
         String userId = loginController.getUserId();
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         executorService.execute(() -> {
 
             String recipeId = "";
-
-
             try {
                 URL url = new URL("https://lamp.ms.wits.ac.za/home/s2670867/get_recipeID.php?name="+ recipeName);
                 HttpURLConnection urlConnection = (HttpURLConnection)url.openConnection();
@@ -123,6 +128,7 @@ public class RecipeCardAdapter extends RecyclerView.Adapter<RecipeCardAdapter.Re
 
                     JSONObject jsonResponse = new JSONObject(response);
                     boolean success = jsonResponse.getBoolean("success");
+                    //Toast.makeText(context, "Removed from favorites", Toast.LENGTH_SHORT).show();
 
                     urlConnection.disconnect();
                 } else {
@@ -138,8 +144,8 @@ public class RecipeCardAdapter extends RecyclerView.Adapter<RecipeCardAdapter.Re
                     JSONObject jsonResponse = new JSONObject(response);
                     boolean success = jsonResponse.getBoolean("success");
 
-                    JSONArray jsonArray = new JSONArray(response);
-                    ArrayList<Recipe> recipes = new ArrayList<>();
+//                    JSONArray jsonArray = new JSONArray(response);
+//                    ArrayList<Recipe> recipes = new ArrayList<>();
 
                     urlConnection.disconnect();
                 }

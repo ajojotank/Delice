@@ -158,7 +158,7 @@ public class FriendsFragment extends Fragment {
                     String friendId = jsonObject.getString("friend_id");
                     String friendUsername = jsonObject.getString("friend_username");
                     String friendName = jsonObject.getString("friend_name");
-                    Friend friend = new Friend(friendId,friendUsername,friendName);
+                    Friend friend = new Friend(friendId,friendName,friendUsername);
                     friends.add(friend);
 
                 }

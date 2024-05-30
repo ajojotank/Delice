@@ -57,9 +57,10 @@ public class FriendRecipeBookActivity extends AppCompatActivity {
     private void fetchAndDisplayFavorites(String friendUsername) {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         Handler handler = new Handler(Looper.getMainLooper());
-
+        String userId = loginController.getUserId();
         executorService.execute(() -> {
             String friendId="";
+            Log.e("Check username","username: "+friendUsername);
 
             try {
                 URL url = new URL("https://lamp.ms.wits.ac.za/home/s2670867/get_user.php?username=" + friendUsername);
@@ -96,11 +97,30 @@ public class FriendRecipeBookActivity extends AppCompatActivity {
                     JSONObject recipeJson = jsonArray.getJSONObject(i);
                     String title = recipeJson.getString("title");
                     String description = recipeJson.getString("description");
-                    String author = recipeJson.getString("author_name"); // Assuming author_id is sufficient for now
-                    String imageUrl = recipeJson.getString("image_path");
+                    String author = recipeJson.getString("author"); // Assuming author_id is sufficient for now
+                    String imageUrl = recipeJson.getString("image_url");
                     String recipeId = recipeJson.getString("recipe_id");
 
-                    boolean isFavorite = IsFavoriteRecipe.getIsFavorite(loginController.getUserId(), recipeId);
+                    boolean isFavorite = false;
+                    try {
+                        URL urlFavorite = new URL("https://lamp.ms.wits.ac.za/home/s2670867/get_user_favorite.php?user_id=" + userId + "&recipe_id=" + recipeId);
+                        HttpURLConnection urlConnectionFavorite = (HttpURLConnection) urlFavorite.openConnection();
+                        urlConnectionFavorite.setRequestMethod("GET");
+
+                        InputStream inFavorite = new BufferedInputStream(urlConnectionFavorite.getInputStream());
+                        String responseFavorite = convertStreamToString(inFavorite);
+                        Log.d("setupRecyclerView", "userId: " + userId + " recipeId: " + recipeId);
+                        Log.d("setupRecyclerView", "Response get favorite status: " + responseFavorite);
+                        JSONArray jsonArrayFav = new JSONArray(responseFavorite);
+                        isFavorite = jsonArrayFav.getBoolean(0);
+                        Log.e("value of isFavorte","Value of isFavorite: "+isFavorite);
+
+
+                        inFavorite.close();
+                        urlConnectionFavorite.disconnect();
+                    } catch (Exception e) {
+                        Log.e("FavoriteRecipes", "Recipe doesnt exist", e);
+                    }
 
                     List<String> ingredients = new ArrayList<>();
                     if (recipeJson.has("ingredients")) {
