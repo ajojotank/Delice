@@ -1,28 +1,47 @@
 package com.example.delice.ui.recipe;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.delice.R;
+import com.example.delice.utilities.LoginController;
 import com.squareup.picasso.Picasso;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class RecipeDetailActivity extends AppCompatActivity {
     private List<Comment> comments;
     private CommentAdapter commentAdapter;
     private RatingBar ratingBar;
     private Recipe recipe; // Assuming Recipe is a class with a boolean 'favourite' field
+    private static final String TAG = "RecipeDetailActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +54,9 @@ public class RecipeDetailActivity extends AppCompatActivity {
         commentAdapter = new CommentAdapter(comments);
         commentsRecyclerView.setAdapter(commentAdapter);
         commentsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        //fetch comments on recipe
+        fetchComments();
 
         // Handle the comment posting
         EditText commentInput = findViewById(R.id.editTextComment);
@@ -94,5 +116,96 @@ public class RecipeDetailActivity extends AppCompatActivity {
             sb.append("• ").append(item).append("\n");
         }
         return sb.toString().trim(); // Removes the last newline character
+    }
+
+    private void fetchComments() {
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        executorService.execute(() -> {
+            int recipeId = getRecipeID();
+
+            try {
+                URL url = new URL("https://lamp.ms.wits.ac.za/home/s2670867/get_comments.php?recipe_id=" + recipeId);
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setRequestMethod("GET");
+
+                InputStream in = new BufferedInputStream(urlConnection.getInputStream());
+                String response = convertStreamToString(in);
+                Log.d(TAG, "Response: " + response);
+
+                parseComments(response);
+
+                urlConnection.disconnect();
+            } catch (Exception e) {
+                Log.e(TAG, "Error fetching comments", e);
+            }
+        });
+    }
+
+    private void parseComments(String response) {
+        try {
+            JSONArray commentsArray = new JSONArray(response);
+            List<Comment> fetchedComments = new ArrayList<>();
+            for (int i = 0; i < commentsArray.length(); i++) {
+                JSONObject commentObject = commentsArray.getJSONObject(i);
+                String username = commentObject.getString("commenter_username");
+                String comment = commentObject.getString("comment");
+                float rating = (float) commentObject.getDouble("rating");
+
+                // Handle the comment data as needed, e.g., update UI or store in a list
+                fetchedComments.add(new Comment(username, comment, rating));
+            }
+
+            //update adapter with the fetched meals
+            runOnUiThread(() -> {
+                comments.clear();
+                comments.addAll(fetchedComments);
+                commentAdapter.notifyDataSetChanged();
+            });
+        } catch (JSONException e) {
+            Log.e(TAG, "Error parsing comments", e);
+        }
+    }
+
+    private String convertStreamToString(InputStream is) {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        StringBuilder sb = new StringBuilder();
+        String line;
+        try {
+            while ((line = reader.readLine()) != null) {
+                sb.append(line).append('\n');
+            }
+        } catch (IOException e) {
+            Log.e(TAG, "Error reading stream", e);
+        } finally {
+            try {
+                is.close();
+            } catch (IOException e) {
+                Log.e(TAG, "Error closing stream", e);
+            }
+        }
+        return sb.toString();
+    }
+
+    private int getRecipeID() {
+        // Get recipe ID
+        recipe = (Recipe) getIntent().getSerializableExtra("RECIPE_DATA");
+        String recipeName = recipe.getTitle();
+        int recipeId = 0;
+        try {
+            URL url = new URL("https://lamp.ms.wits.ac.za/home/s2670867/get_recipeID.php?name=" + recipeName);
+            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.setRequestMethod("GET");
+
+            InputStream in = new BufferedInputStream(urlConnection.getInputStream());
+            String response = convertStreamToString(in);
+            Log.d(TAG, "Response: " + response);
+
+            JSONArray jsonArray = new JSONArray(response);
+            JSONObject jsonObject = jsonArray.getJSONObject(0);
+            recipeId = jsonObject.getInt("recipe_id");
+        } catch (Exception e) {
+            Log.e(TAG, "Error getting recipesID", e);
+        }
+        return recipeId;
     }
 }
